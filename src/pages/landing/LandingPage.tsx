@@ -640,18 +640,43 @@ export function LandingPage() {
                 <li><Link to="/employer/login" className="hover:text-white transition">Employer Sign In</Link></li>
                 <li><Link to="/employer/register" className="hover:text-white transition">Register Organization</Link></li>
                 <li><Link to="/companies" className="hover:text-white transition">Verified Employers Directory</Link></li>
+                <li>
+                  <Link to="/admin/login" className="hover:text-white transition text-slate-400" title="Admin Portal">
+                    Privacy
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
 
           <div className="mt-12 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <p>&copy; {new Date().getFullYear()} {content.footer.copyright}</p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <p>&copy; {new Date().getFullYear()} {content.footer.copyright}</p>
+              <span>&bull;</span>
+              <Link
+                to="/admin/login"
+                className="hover:text-slate-300 transition hover:underline text-slate-400"
+                id="footer-privacy-link"
+                data-testid="footer-privacy-link"
+                title="Admin Portal"
+              >
+                Privacy
+              </Link>
+            </div>
+            <div className="flex items-center gap-4 flex-wrap">
               <span>{content.footer.badge1}</span>
               <span>&bull;</span>
               <span>{content.footer.badge2}</span>
               <span>&bull;</span>
               <span>{content.footer.badge3}</span>
+              <span>&bull;</span>
+              <Link
+                to="/admin/login"
+                className="hover:text-slate-300 transition text-slate-400"
+                title="Admin Portal"
+              >
+                Privacy
+              </Link>
             </div>
           </div>
         </div>

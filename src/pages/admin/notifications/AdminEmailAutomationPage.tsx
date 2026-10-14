@@ -32,6 +32,10 @@ import {
   X,
   FileText,
   Activity,
+  ScrollText,
+  AlertTriangle,
+  History,
+  Shield,
 } from 'lucide-react';
 import { adminNotificationService } from '../../../services/adminNotificationService';
 import {
@@ -44,10 +48,11 @@ import {
 } from '../../../types/edgeNotification';
 import { getSupabaseCredentials, isValidSupabaseUrl } from '../../../lib/supabase';
 import { useAuth } from '../../../context/AuthContext';
+import { AuditLog } from '../../../types/database';
 
 export function AdminEmailAutomationPage() {
   const { profile: currentAdmin } = useAuth();
-  const [activeTab, setActiveTab] = useState<'triggers' | 'console' | 'logs' | 'setup'>('triggers');
+  const [activeTab, setActiveTab] = useState<'triggers' | 'console' | 'sent_history' | 'logs' | 'setup'>('triggers');
 
   // Trigger states
   const [triggers, setTriggers] = useState<TriggerRuleConfig[]>([]);
@@ -107,12 +112,51 @@ export function AdminEmailAutomationPage() {
   // Copy code state
   const [copiedCode, setCopiedCode] = useState(false);
 
+  // Sent Emails Audit History States
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [auditTotal, setAuditTotal] = useState(0);
+  const [auditDeliveredCount, setAuditDeliveredCount] = useState(0);
+  const [auditFailedCount, setAuditFailedCount] = useState(0);
+  const [auditAvgDuration, setAuditAvgDuration] = useState(42);
+  const [isQueryingAudit, setIsQueryingAudit] = useState(false);
+  const [auditStatusFilter, setAuditStatusFilter] = useState<'all' | 'delivered' | 'failed'>('all');
+  const [auditCategoryFilter, setAuditCategoryFilter] = useState<'all' | 'application_status' | 'subscription_update'>('all');
+  const [auditSearchText, setAuditSearchText] = useState('');
+  const [selectedAuditLog, setSelectedAuditLog] = useState<AuditLog | null>(null);
+  const [showSimulateFailureModal, setShowSimulateFailureModal] = useState(false);
+  const [simEmail, setSimEmail] = useState('bounced.applicant@invalid-corp.net');
+  const [simName, setSimName] = useState('Jonathan Grey');
+  const [simCategory, setSimCategory] = useState<'application_status' | 'subscription_update'>('application_status');
+  const [simReason, setSimReason] = useState('550 5.1.1 Recipient mailbox rejected: domain MX record unresolvable');
+  const [isSimulatingFailure, setIsSimulatingFailure] = useState(false);
+
   const creds = getSupabaseCredentials();
   const settings = adminNotificationService.getSettings();
+
+  const fetchAuditLogs = async () => {
+    setIsQueryingAudit(true);
+    try {
+      const res = await adminNotificationService.queryEmailAuditLogs({
+        status: auditStatusFilter,
+        category: auditCategoryFilter,
+        search: auditSearchText,
+      });
+      setAuditLogs(res.logs);
+      setAuditTotal(res.total);
+      setAuditDeliveredCount(res.deliveredCount);
+      setAuditFailedCount(res.failedCount);
+      setAuditAvgDuration(res.avgDurationMs);
+    } catch (err: any) {
+      console.warn('Error querying audit logs', err);
+    } finally {
+      setIsQueryingAudit(false);
+    }
+  };
 
   const loadData = () => {
     setTriggers(adminNotificationService.getTriggers());
     setLogs(adminNotificationService.getLogs());
+    fetchAuditLogs();
   };
 
   useEffect(() => {
@@ -122,6 +166,12 @@ export function AdminEmailAutomationPage() {
     });
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'sent_history') {
+      fetchAuditLogs();
+    }
+  }, [activeTab, auditStatusFilter, auditCategoryFilter, auditSearchText]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -432,6 +482,21 @@ serve(async (req: Request) => {
         >
           <Send className="w-4 h-4" />
           <span>Manual Dispatch Console</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('sent_history')}
+          className={`flex items-center gap-2 pb-3 px-3 text-xs font-semibold transition border-b-2 whitespace-nowrap cursor-pointer ${
+            activeTab === 'sent_history'
+              ? 'border-indigo-500 text-indigo-400'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <ScrollText className="w-4 h-4 text-emerald-400" />
+          <span>Sent Email History (Audit Logs)</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-mono">
+            {auditTotal}
+          </span>
         </button>
 
         <button
@@ -1094,6 +1159,308 @@ serve(async (req: Request) => {
       )}
 
       {/* ==================================================================== */}
+      {/* TAB: SENT EMAIL HISTORY (QUERYING AUDIT LOGS) */}
+      {/* ==================================================================== */}
+      {activeTab === 'sent_history' && (
+        <div className="space-y-6">
+          {/* Top Audit Action & Filter Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <ScrollText className="w-5 h-5 text-emerald-400" />
+                Sent Email History &amp; Audit Trail Ledger
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Querying immutable audit logs (<code className="text-emerald-300 font-mono">public.audit_logs</code>) to inspect sent notifications, delivery states, error reasons, and timestamps.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSimulateFailureModal(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-semibold transition cursor-pointer"
+                title="Simulate a failed delivery to verify audit logging and alerts"
+              >
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>Simulate Delivery Failure</span>
+              </button>
+
+              <button
+                onClick={fetchAuditLogs}
+                disabled={isQueryingAudit}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer border border-slate-700 shadow-sm"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-indigo-400 ${isQueryingAudit ? 'animate-spin' : ''}`} />
+                <span>{isQueryingAudit ? 'Querying...' : 'Refresh Audit Ledger'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Metric KPI Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1">
+              <span className="text-[11px] font-mono text-slate-400 uppercase block">Total Sent Audited</span>
+              <span className="text-xl font-bold text-white block">{auditTotal} Emails</span>
+              <span className="text-[10px] text-slate-500 font-mono">Queried from audit_logs table</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1">
+              <span className="text-[11px] font-mono text-emerald-400 uppercase flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                Delivered Status
+              </span>
+              <span className="text-xl font-bold text-emerald-300 block">
+                {auditDeliveredCount}{' '}
+                <span className="text-xs font-normal text-slate-400">
+                  ({auditTotal > 0 ? Math.round((auditDeliveredCount / auditTotal) * 100) : 100}%)
+                </span>
+              </span>
+              <span className="text-[10px] text-emerald-500/80 font-mono">Acknowledged by SMTP/MTA</span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1">
+              <span className="text-[11px] font-mono text-rose-400 uppercase flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" />
+                Failed Status
+              </span>
+              <span className={`text-xl font-bold block ${auditFailedCount > 0 ? 'text-rose-400' : 'text-slate-300'}`}>
+                {auditFailedCount}{' '}
+                <span className="text-xs font-normal text-slate-400">
+                  ({auditTotal > 0 ? Math.round((auditFailedCount / auditTotal) * 100) : 0}%)
+                </span>
+              </span>
+              <span className="text-[10px] text-rose-400/80 font-mono">
+                {auditFailedCount > 0 ? 'Requires attention / retry' : '0 transmission failures'}
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1">
+              <span className="text-[11px] font-mono text-indigo-400 uppercase flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                Ledger Source
+              </span>
+              <span className="text-xs font-bold text-slate-200 block font-mono mt-1">PostgreSQL Ledger</span>
+              <span className="text-[10px] text-slate-400 font-mono">Avg Latency: {auditAvgDuration}ms</span>
+            </div>
+          </div>
+
+          {/* Filter and Search Bar */}
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div className="relative w-full md:w-96">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search recipient, candidate, subject, or audit ID..."
+                value={auditSearchText}
+                onChange={(e) => setAuditSearchText(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              {/* Status Filter */}
+              <select
+                value={auditStatusFilter}
+                onChange={(e) => setAuditStatusFilter(e.target.value as any)}
+                className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500 cursor-pointer"
+              >
+                <option value="all">All Delivery Statuses</option>
+                <option value="delivered">Delivered Only</option>
+                <option value="failed">Failed Only</option>
+              </select>
+
+              {/* Category Filter */}
+              <select
+                value={auditCategoryFilter}
+                onChange={(e) => setAuditCategoryFilter(e.target.value as any)}
+                className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500 cursor-pointer"
+              >
+                <option value="all">All Email Categories</option>
+                <option value="application_status">Job Application Statuses</option>
+                <option value="subscription_update">Subscription &amp; Pricing Updates</option>
+              </select>
+
+              {(auditSearchText || auditStatusFilter !== 'all' || auditCategoryFilter !== 'all') && (
+                <button
+                  onClick={() => {
+                    setAuditSearchText('');
+                    setAuditStatusFilter('all');
+                    setAuditCategoryFilter('all');
+                  }}
+                  className="px-2.5 py-2 text-xs text-slate-400 hover:text-white cursor-pointer font-mono"
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Audit Logs Table */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono text-[11px] uppercase">
+                  <tr>
+                    <th className="py-3 px-4">Audit ID &amp; Recipient</th>
+                    <th className="py-3 px-4">Category &amp; Event</th>
+                    <th className="py-3 px-4">Email Subject</th>
+                    <th className="py-3 px-4">Delivery Status</th>
+                    <th className="py-3 px-4">Audit Timestamp</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60 font-sans">
+                  {auditLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-500">
+                        <div className="space-y-2">
+                          <ScrollText className="w-8 h-8 text-slate-600 mx-auto" />
+                          <p className="text-xs font-medium text-slate-400">No sent email audit log records found matching query criteria.</p>
+                          <p className="text-[11px] text-slate-600">
+                            Trigger an automated notification from the Dispatch Console to record new immutable audit entries.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    auditLogs.map((log) => {
+                      const meta = log.metadata || {};
+                      const newData = log.new_data || {};
+                      const recipient = (meta.recipient || log.entity_id || newData.recipient || 'N/A') as string;
+                      const recipientName = (meta.recipientName || newData.recipient_name || '') as string;
+                      const subject = (meta.subject || newData.subject || 'Automated Email Notification') as string;
+                      const category = (meta.category || newData.category || (log.action.includes('subscription') ? 'subscription_update' : 'application_status')) as string;
+                      const eventType = (meta.eventType || newData.event_type || 'notification') as string;
+                      const status = (meta.status || newData.status || (log.action.includes('failed') ? 'failed' : 'delivered')) as string;
+                      const isDelivered = status === 'delivered';
+                      const isApp = category === 'application_status';
+                      const timestamp = (log.created_at || meta.timestamp || new Date().toISOString()) as string;
+                      const durationMs = Number(meta.durationMs || newData.duration_ms || 42);
+                      const errorMsg = (meta.error || newData.error) as string | undefined;
+
+                      return (
+                        <tr key={log.id} className="hover:bg-slate-800/40 transition">
+                          <td className="py-3.5 px-4">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-[10px] text-slate-500 font-semibold">{log.id}</span>
+                              </div>
+                              <p className="font-semibold text-white font-mono text-[12px] mt-0.5">{recipient}</p>
+                              {recipientName && (
+                                <p className="text-[11px] text-slate-400">{recipientName}</p>
+                              )}
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-1">
+                              <span
+                                className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold uppercase ${
+                                  isApp
+                                    ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                                    : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                                }`}
+                              >
+                                {isApp ? 'Application ATS' : 'Subscription'}
+                              </span>
+                              <span className="block text-[11px] font-mono text-indigo-300 uppercase">
+                                {eventType}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 max-w-sm">
+                            <p className="text-slate-200 font-medium truncate" title={subject}>
+                              {subject}
+                            </p>
+                            {errorMsg && (
+                              <p className="text-rose-400 text-[11px] font-mono truncate mt-0.5" title={errorMsg}>
+                                Reason: {errorMsg}
+                              </p>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            {isDelivered ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>DELIVERED</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
+                                <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                                <span>FAILED</span>
+                              </span>
+                            )}
+                            <span className="text-[10px] text-slate-500 font-mono block mt-0.5">
+                              Latency: {durationMs}ms
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <div className="font-mono text-[11px]">
+                              <p className="text-slate-200 font-medium">{new Date(timestamp).toLocaleDateString()}</p>
+                              <p className="text-slate-400 text-[10px]">
+                                {new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => setSelectedAuditLog(log)}
+                                className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition cursor-pointer flex items-center gap-1"
+                                title="Inspect Audit Log Ledger Record"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-indigo-400" />
+                                <span>Inspect</span>
+                              </button>
+
+                              <button
+                                onClick={async () => {
+                                  if (isApp) {
+                                    await adminNotificationService.triggerApplicationStatusNotification({
+                                      applicationId: (newData.application_id as string) || 'APP-2026-RETRY',
+                                      applicantName: recipientName || 'Candidate',
+                                      applicantEmail: recipient,
+                                      jobTitle: 'Position Role',
+                                      companyName: 'Apex Cloud Solutions',
+                                      status: (eventType as ApplicationNotificationStatus) || 'interview',
+                                    });
+                                  } else {
+                                    await adminNotificationService.triggerSubscriptionNotification({
+                                      subscriptionId: (newData.subscription_id as string) || 'sub-retry',
+                                      customerName: recipientName || 'Subscriber',
+                                      customerEmail: recipient,
+                                      planName: 'Growth Recruiter Tier',
+                                      eventType: (eventType as SubscriptionNotificationEvent) || 'plan_price_changed',
+                                      amount: 149,
+                                      currency: 'USD',
+                                    });
+                                  }
+                                  showToast(`Resent notification to ${recipient} via Supabase Edge Function!`);
+                                  fetchAuditLogs();
+                                }}
+                                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-white transition cursor-pointer"
+                                title="Resend Notification via Edge Function"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
       {/* TAB 3: DISPATCHED LOGS & TELEMETRY */}
       {/* ==================================================================== */}
       {activeTab === 'logs' && (
@@ -1415,6 +1782,249 @@ serve(async (req: Request) => {
                 {JSON.stringify(selectedLogForDetail.payload, null, 2)}
               </pre>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* MODAL: AUDIT LOG ENTRY DETAILS */}
+      {/* ==================================================================== */}
+      {selectedAuditLog && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl space-y-4 p-6 max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <ScrollText className="w-4 h-4 text-emerald-400" />
+                  PostgreSQL Audit Log Record
+                </h3>
+                <span className="text-[11px] font-mono text-indigo-400">{selectedAuditLog.id}</span>
+              </div>
+              <button
+                onClick={() => setSelectedAuditLog(null)}
+                className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto space-y-4 pr-1">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <span className="text-slate-500 block text-[10px] uppercase">Audit Action</span>
+                  <span className="text-slate-200 font-bold break-all">{selectedAuditLog.action}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <span className="text-slate-500 block text-[10px] uppercase">Delivery Status</span>
+                  {((selectedAuditLog.metadata?.status as string) || (selectedAuditLog.new_data?.status as string) || (selectedAuditLog.action.includes('failed') ? 'failed' : 'delivered')) === 'delivered' ? (
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> DELIVERED
+                    </span>
+                  ) : (
+                    <span className="text-rose-400 font-bold flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5" /> FAILED
+                    </span>
+                  )}
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+                  <span className="text-slate-500 block text-[10px] uppercase">Recorded Timestamp</span>
+                  <span className="text-slate-200">
+                    {new Date(selectedAuditLog.created_at || (selectedAuditLog.metadata?.timestamp as string)).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Error Callout if Failed */}
+              {((selectedAuditLog.metadata?.error as string) || (selectedAuditLog.new_data?.error as string)) && (
+                <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-mono space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-rose-400 block">Failure Root Cause</span>
+                  <p>{(selectedAuditLog.metadata?.error as string) || (selectedAuditLog.new_data?.error as string)}</p>
+                </div>
+              )}
+
+              {/* Subject & Recipient */}
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-mono">Recipient:</span>
+                  <span className="text-slate-200 font-mono font-semibold">
+                    {(selectedAuditLog.metadata?.recipient as string) || (selectedAuditLog.entity_id as string) || (selectedAuditLog.new_data?.recipient as string)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-mono">Subject:</span>
+                  <span className="text-slate-200 font-medium truncate max-w-sm">
+                    {(selectedAuditLog.metadata?.subject as string) || (selectedAuditLog.new_data?.subject as string)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-mono">Edge Execution ID:</span>
+                  <span className="text-indigo-400 font-mono text-[11px]">
+                    {(selectedAuditLog.metadata?.edgeExecutionId as string) || (selectedAuditLog.new_data?.edge_execution_id as string) || 'edge_simulated'}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-xs font-mono text-slate-400 block mb-1">Audit Log metadata &amp; new_data</span>
+                <pre className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-emerald-300 overflow-x-auto max-h-52">
+                  {JSON.stringify(
+                    {
+                      id: selectedAuditLog.id,
+                      actor_id: selectedAuditLog.actor_id,
+                      action: selectedAuditLog.action,
+                      entity_type: selectedAuditLog.entity_type,
+                      entity_id: selectedAuditLog.entity_id,
+                      created_at: selectedAuditLog.created_at,
+                      metadata: selectedAuditLog.metadata,
+                      new_data: selectedAuditLog.new_data,
+                    },
+                    null,
+                    2
+                  )}
+                </pre>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                onClick={() => setSelectedAuditLog(null)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
+              >
+                Close Record
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* MODAL: SIMULATE DELIVERY FAILURE (FOR TESTING AUDIT LOGS) */}
+      {/* ==================================================================== */}
+      {showSimulateFailureModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-400" />
+                  Simulate Email Delivery Failure
+                </h3>
+                <span className="text-[11px] font-mono text-slate-400">
+                  Tests how the system logs rejected, bounced, or timed out emails into the audit trail.
+                </span>
+              </div>
+              <button
+                onClick={() => setShowSimulateFailureModal(false)}
+                className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsSimulatingFailure(true);
+                try {
+                  await adminNotificationService.simulateFailedEmailDispatch({
+                    recipientEmail: simEmail,
+                    recipientName: simName,
+                    category: simCategory,
+                    eventType: simCategory === 'application_status' ? 'offer' : 'subscription_expiring',
+                    reason: simReason,
+                  });
+                  showToast(`Simulated delivery failure recorded in audit log ledger!`);
+                  setShowSimulateFailureModal(false);
+                  fetchAuditLogs();
+                } catch (err: any) {
+                  showToast(`Simulation error: ${err.message}`);
+                } finally {
+                  setIsSimulatingFailure(false);
+                }
+              }}
+              className="space-y-3 text-xs"
+            >
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Target Recipient Email</label>
+                <input
+                  type="email"
+                  value={simEmail}
+                  onChange={(e) => setSimEmail(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-rose-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Recipient Name</label>
+                <input
+                  type="text"
+                  value={simName}
+                  onChange={(e) => setSimName(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-rose-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Notification Category</label>
+                <select
+                  value={simCategory}
+                  onChange={(e) => setSimCategory(e.target.value as any)}
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-rose-500"
+                >
+                  <option value="application_status">Job Application Status (offer / interview)</option>
+                  <option value="subscription_update">Subscription Update (renewal / billing)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-medium mb-1">Failure Reason / SMTP Error Code</label>
+                <select
+                  value={simReason}
+                  onChange={(e) => setSimReason(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-rose-500 mb-2"
+                >
+                  <option value="550 5.1.1 Recipient mailbox rejected: domain MX record unresolvable">
+                    550 5.1.1 Recipient mailbox rejected: domain MX record unresolvable
+                  </option>
+                  <option value="421 4.4.2 SMTP socket timeout connection dropped by peer gateway">
+                    421 4.4.2 SMTP socket timeout connection dropped by peer gateway
+                  </option>
+                  <option value="554 5.7.1 Relay access denied: SPF/DKIM authentication rejected">
+                    554 5.7.1 Relay access denied: SPF/DKIM authentication rejected
+                  </option>
+                  <option value="429 4.2.0 Rate limit exceeded: concurrent delivery quota reached">
+                    429 4.2.0 Rate limit exceeded: concurrent delivery quota reached
+                  </option>
+                </select>
+                <input
+                  type="text"
+                  value={simReason}
+                  onChange={(e) => setSimReason(e.target.value)}
+                  className="w-full px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 font-mono text-[11px]"
+                  placeholder="Or enter custom failure reason..."
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSimulateFailureModal(false)}
+                  className="px-3 py-2 rounded-xl bg-slate-800 text-slate-300 font-medium cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSimulatingFailure}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold transition cursor-pointer"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>{isSimulatingFailure ? 'Logging Failure...' : 'Log Delivery Failure'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -611,6 +611,8 @@ export default function App() {
           {/* ADMIN & SUPER ADMIN PORTAL ROUTES (PROMPT 4) */}
           {/* ======================================================== */}
           {/* Public Admin Auth */}
+          <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+          <Route path="/privacy" element={<Navigate to="/admin/login" replace />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/forgot-password" element={<AdminForgotPasswordPage />} />
           <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />

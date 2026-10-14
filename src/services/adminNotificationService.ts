@@ -450,7 +450,7 @@ export class AdminNotificationService {
       'email_notification',
       payload.applicantEmail,
       {
-        oldData: null,
+        oldData: undefined,
         newData: {
           recipient: payload.applicantEmail,
           recipient_name: payload.applicantName,
@@ -641,7 +641,7 @@ export class AdminNotificationService {
       'email_notification',
       payload.customerEmail,
       {
-        oldData: null,
+        oldData: undefined,
         newData: {
           recipient: payload.customerEmail,
           recipient_name: payload.customerName,
@@ -879,7 +879,7 @@ export class AdminNotificationService {
     const executionId = `edge_fail_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
     const log = {
-      oldData: null,
+      oldData: undefined,
       newData: {
         recipient: params.recipientEmail,
         recipient_name: params.recipientName,
