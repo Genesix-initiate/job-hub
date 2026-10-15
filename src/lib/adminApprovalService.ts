@@ -23,38 +23,8 @@ export interface AdminAccessRequest {
 const STORAGE_KEY_REQUESTS = 'jobhub_admin_access_requests';
 const STORAGE_KEY_APPROVED = 'jobhub_approved_admin_list';
 
-// Initial seed requests demonstrating pending and approved queue
-const SEED_REQUESTS: AdminAccessRequest[] = [
-  {
-    id: 'req-init-content',
-    email: 'content@jobhub.platform',
-    name: 'Chioma Adeyemi',
-    requestedRole: 'content_admin',
-    status: 'approved',
-    reason: 'CMS content management and taxonomy curation',
-    requestedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    reviewedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    reviewedBy: 'genesixintiate@gmail.com',
-  },
-  {
-    id: 'req-pending-01',
-    email: 'recruiter.lead@jobhub.platform',
-    name: 'Tunde Bakare',
-    requestedRole: 'recruitment_admin',
-    status: 'pending',
-    reason: 'Candidate pipeline vetting and technical interview scheduling',
-    requestedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-  },
-  {
-    id: 'req-pending-02',
-    email: 'compliance.officer@jobhub.platform',
-    name: 'Amaka Eze',
-    requestedRole: 'verification_admin',
-    status: 'pending',
-    reason: 'Corporate registration and CAC verification audits',
-    requestedAt: new Date(Date.now() - 3600000 * 1).toISOString(),
-  },
-];
+// Initial requests queue starts empty for production
+const SEED_REQUESTS: AdminAccessRequest[] = [];
 
 export const adminApprovalService = {
   /**
