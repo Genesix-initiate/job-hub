@@ -273,9 +273,7 @@ export class AdminNotificationService {
     if (typeof window === 'undefined') return [];
     const raw = localStorage.getItem(STORAGE_LOGS_KEY);
     if (!raw) {
-      const initialLogs = this.generateSeedLogs();
-      localStorage.setItem(STORAGE_LOGS_KEY, JSON.stringify(initialLogs));
-      return initialLogs;
+      return [];
     }
     try {
       return JSON.parse(raw);
@@ -1035,110 +1033,7 @@ export class AdminNotificationService {
   // ====================================================================
 
   private generateSeedLogs(): EdgeNotificationResponse[] {
-    return [
-      {
-        id: 'log-001',
-        success: true,
-        executionMode: 'edge_simulated_runtime',
-        functionName: 'dispatch-notification',
-        edgeExecutionId: 'edge_exec_98124_prod',
-        durationMs: 44,
-        recipient: 'alex.morgan@example.com',
-        subject: '[JOBHUB ATS] Technical Interview Invitation Scheduled - Senior Staff Frontend Architect at Apex Cloud Solutions',
-        category: 'application_status',
-        eventType: 'interview',
-        status: 'delivered',
-        timestamp: new Date(Date.now() - 3600000 * 3).toISOString(),
-        htmlPreview: this.generateApplicationHtmlPreview(
-          {
-            applicationId: 'APP-2026-0812',
-            applicantName: 'Alex Morgan',
-            applicantEmail: 'alex.morgan@example.com',
-            jobTitle: 'Senior Staff Frontend Architect',
-            companyName: 'Apex Cloud Solutions',
-            status: 'interview',
-            interviewDate: 'Tomorrow at 3:00 PM UTC',
-            interviewMeetingLink: 'https://meet.jobhub.platform/apex-frontend',
-            notes: 'Round 2 Technical System Architecture with VP of Engineering.',
-          },
-          'Technical Interview Invitation Scheduled'
-        ),
-        payload: {
-          type: 'job_application_status',
-          recipientEmail: 'alex.morgan@example.com',
-          data: { status: 'interview', jobTitle: 'Senior Staff Frontend Architect' },
-        },
-        httpStatusCode: 200,
-      },
-      {
-        id: 'log-002',
-        success: true,
-        executionMode: 'edge_simulated_runtime',
-        functionName: 'dispatch-notification',
-        edgeExecutionId: 'edge_exec_98125_prod',
-        durationMs: 38,
-        recipient: 'billing@apexcloud.example.com',
-        subject: '[JOBHUB Billing] Payment Confirmed & Tax Invoice [INV-2026-0041]',
-        category: 'subscription_update',
-        eventType: 'payment_received',
-        status: 'delivered',
-        timestamp: new Date(Date.now() - 3600000 * 6).toISOString(),
-        htmlPreview: this.generateSubscriptionHtmlPreview(
-          {
-            subscriptionId: 'sub_apex_01',
-            customerName: 'Marcus Vance',
-            customerEmail: 'billing@apexcloud.example.com',
-            companyName: 'Apex Cloud Solutions',
-            planName: 'Growth Recruiter Tier',
-            eventType: 'payment_received',
-            amount: 149,
-            currency: 'USD',
-            invoiceNumber: 'INV-2026-0041',
-            paymentChannel: 'Paystack Multi-Currency Rail',
-            nextBillingDate: 'November 12, 2026',
-          },
-          'Payment Confirmed & Tax Invoice [INV-2026-0041]'
-        ),
-        payload: {
-          type: 'subscription_update',
-          recipientEmail: 'billing@apexcloud.example.com',
-          data: { eventType: 'payment_received', amount: 149 },
-        },
-        httpStatusCode: 200,
-      },
-      {
-        id: 'log-003',
-        success: true,
-        executionMode: 'edge_simulated_runtime',
-        functionName: 'dispatch-notification',
-        edgeExecutionId: 'edge_exec_98126_prod',
-        durationMs: 51,
-        recipient: 'samantha.reed@example.com',
-        subject: '[JOBHUB ATS] Shortlisted for Interview Round - Lead Cloud Infrastructure & DevOps at Apex Cloud Solutions',
-        category: 'application_status',
-        eventType: 'shortlisted',
-        status: 'delivered',
-        timestamp: new Date(Date.now() - 3600000 * 14).toISOString(),
-        htmlPreview: this.generateApplicationHtmlPreview(
-          {
-            applicationId: 'APP-2026-0813',
-            applicantName: 'Samantha Reed',
-            applicantEmail: 'samantha.reed@example.com',
-            jobTitle: 'Lead Cloud Infrastructure & DevOps',
-            companyName: 'Apex Cloud Solutions',
-            status: 'shortlisted',
-            notes: 'Candidate passed initial automated ATS keyword evaluation with 96% match score.',
-          },
-          'Shortlisted for Interview Round'
-        ),
-        payload: {
-          type: 'job_application_status',
-          recipientEmail: 'samantha.reed@example.com',
-          data: { status: 'shortlisted' },
-        },
-        httpStatusCode: 200,
-      },
-    ];
+    return [];
   }
 }
 

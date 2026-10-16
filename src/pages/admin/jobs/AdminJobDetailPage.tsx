@@ -106,7 +106,7 @@ export function AdminJobDetailPage() {
             </div>
             <p className="text-xs text-slate-400 mt-1 flex items-center gap-2">
               <Building2 className="w-3.5 h-3.5 text-slate-500" />
-              <span>{job.company?.company_name || 'Apex Cloud Solutions'}</span>
+              <span>{job.company?.company_name || 'Unassigned Company'}</span>
               <span>·</span>
               <MapPin className="w-3.5 h-3.5 text-slate-500" />
               <span>{job.city || 'Remote'}, {job.country}</span>

@@ -38,51 +38,33 @@ export function AdminApplicationsPage() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    // Generate realistic multi-company applicant tracking oversight
-    const sampleApps = [
-      {
-        id: 'app-001',
-        application_reference: 'APP-2026-0812',
-        applicant_name: 'Alex Morgan',
-        applicant_email: 'alex.morgan@example.com',
-        job_title: 'Senior Staff Frontend Architect',
-        company_name: 'Apex Cloud Solutions',
-        status: 'interview',
-        applied_at: new Date(Date.now() - 4 * 86400000).toISOString(),
-      },
-      {
-        id: 'app-002',
-        application_reference: 'APP-2026-0813',
-        applicant_name: 'Samantha Reed',
-        applicant_email: 'samantha.reed@example.com',
-        job_title: 'Lead Cloud Infrastructure & DevOps',
-        company_name: 'Apex Cloud Solutions',
-        status: 'shortlisted',
-        applied_at: new Date(Date.now() - 6 * 86400000).toISOString(),
-      },
-      {
-        id: 'app-003',
-        application_reference: 'APP-2026-0814',
-        applicant_name: 'Marcus Vance',
-        applicant_email: 'candidate.vance@example.com',
-        job_title: 'Head of Regulatory Compliance',
-        company_name: 'FinTech Pulse Payments',
-        status: 'applied',
-        applied_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-      },
-      {
-        id: 'app-004',
-        application_reference: 'APP-2026-0815',
-        applicant_name: 'David Chen',
-        applicant_email: 'david.applicant@example.com',
-        job_title: 'Senior Staff Frontend Architect',
-        company_name: 'Apex Cloud Solutions',
-        status: 'hired',
-        applied_at: new Date(Date.now() - 18 * 86400000).toISOString(),
-      },
-    ];
+    // Load real candidate applications from persistent storage or database
+    let realApps: any[] = [];
+    try {
+      const raw =
+        localStorage.getItem('jobhub_employer_applications') ||
+        localStorage.getItem('tf_emp_employer_applications') ||
+        localStorage.getItem('jobhub_applications');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          realApps = parsed.map((a: any) => ({
+            id: a.id || `app-${Date.now()}`,
+            application_reference: a.application_reference || `APP-${(a.id || '0000').slice(0, 8).toUpperCase()}`,
+            applicant_name: a.applicant?.display_name || (a.applicant?.first_name ? `${a.applicant.first_name} ${a.applicant.last_name || ''}`.trim() : 'Applicant'),
+            applicant_email: a.applicant?.email || a.email || 'applicant@candidate.com',
+            job_title: a.job?.title || 'Job Opening',
+            company_name: a.job?.company?.company_name || 'Hiring Organization',
+            status: a.status || 'applied',
+            applied_at: a.applied_at || a.created_at || new Date().toISOString(),
+          }));
+        }
+      }
+    } catch (e) {
+      console.warn('Failed parsing local applications', e);
+    }
 
-    setApplications(sampleApps);
+    setApplications(realApps);
     setIsLoading(false);
   }, []);
 
@@ -181,65 +163,77 @@ export function AdminApplicationsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
-              {filtered.map((app) => (
-                <tr key={app.id} className="hover:bg-slate-800/40 transition">
-                  <td className="py-3.5 px-4 font-mono text-slate-300 font-semibold">
-                    {app.application_reference}
-                  </td>
-
-                  <td className="py-3.5 px-4">
-                    <p className="font-semibold text-white">{app.applicant_name}</p>
-                    <p className="text-[11px] text-slate-500 font-mono">{app.applicant_email}</p>
-                  </td>
-
-                  <td className="py-3.5 px-4 text-slate-300">{app.job_title}</td>
-
-                  <td className="py-3.5 px-4 text-slate-400 font-medium">{app.company_name}</td>
-
-                  <td className="py-3.5 px-4">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase ${
-                        app.status === 'hired'
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                          : app.status === 'interview'
-                          ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
-                          : app.status === 'shortlisted'
-                          ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
-                          : 'bg-slate-800 text-slate-300'
-                      }`}
-                    >
-                      {app.status}
-                    </span>
-                  </td>
-
-                  <td className="py-3.5 px-4 text-slate-400 text-[11px] font-mono">
-                    {new Date(app.applied_at).toLocaleDateString()}
-                  </td>
-
-                  <td className="py-3.5 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        onClick={() => {
-                          setSelectedAppForEmail(app);
-                          setEmailStatus(app.status || 'interview');
-                          setEmailNotes(`Status updated to ${app.status} during admin oversight.`);
-                        }}
-                        className="p-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
-                        title="Trigger Automated Email via Edge Function"
-                      >
-                        <Zap className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => navigate(`/admin/applications/${app.id}`)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
-                        title="Inspect Application Dossier"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                    <FileCheck2 className="w-8 h-8 mx-auto mb-2 text-slate-600 opacity-60" />
+                    <p className="text-xs font-semibold text-slate-400">No applications recorded yet</p>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Candidate submissions received across all published jobs will appear here for oversight.
+                    </p>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((app) => (
+                  <tr key={app.id} className="hover:bg-slate-800/40 transition">
+                    <td className="py-3.5 px-4 font-mono text-slate-300 font-semibold">
+                      {app.application_reference}
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <p className="font-semibold text-white">{app.applicant_name}</p>
+                      <p className="text-[11px] text-slate-500 font-mono">{app.applicant_email}</p>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-slate-300">{app.job_title}</td>
+
+                    <td className="py-3.5 px-4 text-slate-400 font-medium">{app.company_name}</td>
+
+                    <td className="py-3.5 px-4">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase ${
+                          app.status === 'hired'
+                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                            : app.status === 'interview'
+                            ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                            : app.status === 'shortlisted'
+                            ? 'bg-sky-500/15 text-sky-300 border border-sky-500/30'
+                            : 'bg-slate-800 text-slate-300'
+                        }`}
+                      >
+                        {app.status}
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-slate-400 text-[11px] font-mono">
+                      {new Date(app.applied_at).toLocaleDateString()}
+                    </td>
+
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => {
+                            setSelectedAppForEmail(app);
+                            setEmailStatus(app.status || 'interview');
+                            setEmailNotes(`Status updated to ${app.status} during admin oversight.`);
+                          }}
+                          className="p-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
+                          title="Trigger Automated Email via Edge Function"
+                        >
+                          <Zap className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => navigate(`/admin/applications/${app.id}`)}
+                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
+                          title="Inspect Application Dossier"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

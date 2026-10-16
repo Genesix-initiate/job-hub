@@ -56,10 +56,10 @@ class EmailAutomationService {
         category: 'Billing & Payments',
         description: 'Auto-dispatched immediately after Paystack, Bank Transfer, USSD, or OPay settlement with breakdown in selected currency.',
         enabled: true,
-        totalTriggered: 142,
-        openRate: 98.6,
+        totalTriggered: 0,
+        openRate: 100,
         deliveryRate: 100,
-        sampleRecipient: 'finance@jobhub.platform',
+        sampleRecipient: 'finance@jobhub.io',
       },
       {
         id: 'welcome_candidate',
@@ -67,10 +67,10 @@ class EmailAutomationService {
         category: 'Account & Security',
         description: 'Sent upon candidate registration with personalized job recommendations and CV builder guide.',
         enabled: true,
-        totalTriggered: 1250,
-        openRate: 84.2,
-        deliveryRate: 99.8,
-        sampleRecipient: 'candidate@techforge.io',
+        totalTriggered: 0,
+        openRate: 100,
+        deliveryRate: 100,
+        sampleRecipient: 'candidate@jobhub.io',
       },
       {
         id: 'employer_welcome',
@@ -78,10 +78,10 @@ class EmailAutomationService {
         category: 'Account & Security',
         description: 'Sent to recruiting managers with company verification document upload guide and hiring workspace links.',
         enabled: true,
-        totalTriggered: 89,
-        openRate: 94.5,
+        totalTriggered: 0,
+        openRate: 100,
         deliveryRate: 100,
-        sampleRecipient: 'hiring@apexcloud.io',
+        sampleRecipient: 'recruiter@company.com',
       },
       {
         id: 'interview_invitation',
@@ -89,10 +89,10 @@ class EmailAutomationService {
         category: 'Interviews',
         description: 'Automated video conference link, time zone synchronization, and interviewer briefing notes.',
         enabled: true,
-        totalTriggered: 320,
-        openRate: 96.1,
-        deliveryRate: 99.9,
-        sampleRecipient: 'applicant@developer.io',
+        totalTriggered: 0,
+        openRate: 100,
+        deliveryRate: 100,
+        sampleRecipient: 'applicant@candidate.com',
       },
       {
         id: 'application_submitted',
@@ -100,10 +100,10 @@ class EmailAutomationService {
         category: 'Recruitment & Jobs',
         description: 'Instant notification to candidate confirming receipt of application and next screening steps.',
         enabled: true,
-        totalTriggered: 4180,
-        openRate: 89.4,
-        deliveryRate: 99.9,
-        sampleRecipient: 'dev.applicant@gmail.com',
+        totalTriggered: 0,
+        openRate: 100,
+        deliveryRate: 100,
+        sampleRecipient: 'applicant@candidate.com',
       },
       {
         id: 'employer_new_candidate',
@@ -111,10 +111,10 @@ class EmailAutomationService {
         category: 'Recruitment & Jobs',
         description: 'Instant alert dispatched to hiring managers whenever a top-tier candidate matches job posting criteria.',
         enabled: true,
-        totalTriggered: 840,
-        openRate: 91.0,
+        totalTriggered: 0,
+        openRate: 100,
         deliveryRate: 100,
-        sampleRecipient: 'recruiting-team@techcorp.com',
+        sampleRecipient: 'recruiting-team@company.com',
       },
     ];
   }
@@ -139,50 +139,7 @@ class EmailAutomationService {
         // fallback
       }
     }
-    // Return initial seed history
-    return [
-      {
-        id: 'em-001',
-        triggerId: 'payment_confirmation',
-        triggerName: 'Instant Payment Confirmation & Tax Invoice',
-        recipientEmail: 'billing@apexcloud.example.com',
-        recipientName: 'Marcus Vance',
-        subject: 'Receipt & Tax Invoice: JOBHUB Growth Recruiter Tier [TXN-2026-98124]',
-        previewText: 'Thank you for your payment. Your JOBHUB subscription is now active.',
-        htmlBody: this.generatePaymentEmailHtml({
-          customerName: 'Marcus Vance',
-          customerEmail: 'billing@apexcloud.example.com',
-          planName: 'Growth Recruiter Tier',
-          amount: 149,
-          currency: 'USD',
-          formattedAmount: '$149.00',
-          paymentChannel: 'Paystack Multi-Currency Rail',
-          transactionReference: 'TXN-2026-98124',
-          invoiceNumber: 'INV-2026-0041',
-          paidAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-        }),
-        status: 'opened',
-        sentAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-        deliveredAt: new Date(Date.now() - 3600000 * 4 + 1000).toISOString(),
-        openedAt: new Date(Date.now() - 3600000 * 3).toISOString(),
-        channel: 'both',
-      },
-      {
-        id: 'em-002',
-        triggerId: 'welcome_candidate',
-        triggerName: 'Candidate Welcome & ATS Profile Activation',
-        recipientEmail: 'sarah.jenkins@techmail.io',
-        recipientName: 'Sarah Jenkins',
-        subject: 'Welcome to JOBHUB! Your Candidate Portal is Ready',
-        previewText: 'Discover 14,000+ verified engineering, product, and tech roles.',
-        htmlBody: this.generateWelcomeEmailHtml('Sarah Jenkins', 'sarah.jenkins@techmail.io', 'candidate'),
-        status: 'opened',
-        sentAt: new Date(Date.now() - 3600000 * 18).toISOString(),
-        deliveredAt: new Date(Date.now() - 3600000 * 18 + 800).toISOString(),
-        openedAt: new Date(Date.now() - 3600000 * 17).toISOString(),
-        channel: 'email',
-      },
-    ];
+    return [];
   }
 
   public getInAppNotifications(): InAppNotificationItem[] {
@@ -194,36 +151,7 @@ class EmailAutomationService {
         // fallback
       }
     }
-    return [
-      {
-        id: 'notif-1',
-        title: 'Payment Channel Active & Verified',
-        message: 'Paystack, Automated Bank Transfer, USSD (all banks), and OPay are operational across all currencies including NGN ₦.',
-        category: 'payment',
-        read: false,
-        createdAt: new Date().toISOString(),
-        actionUrl: '/employer/billing',
-        actionLabel: 'View Billing',
-      },
-      {
-        id: 'notif-2',
-        title: 'Automated Email Automation Engine Online',
-        message: 'Webhook triggers connected. Automated receipts, application updates, and interview invites will deliver instantly.',
-        category: 'system',
-        read: false,
-        createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-      },
-      {
-        id: 'notif-3',
-        title: 'Candidate Application Shortlisted',
-        message: 'Your application for Senior Staff Frontend Architect has advanced to the Interview Stage.',
-        category: 'interview',
-        read: false,
-        createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-        actionUrl: '/job-seeker/interviews',
-        actionLabel: 'View Interview',
-      },
-    ];
+    return [];
   }
 
   public markNotificationRead(id: string): void {
@@ -322,8 +250,8 @@ class EmailAutomationService {
       subject = 'Payment Confirmed: Enterprise Talent Suite [TXN-TEST-99214]';
       preview = 'Official receipt of ₦148,000 via Paystack / Bank Transfer.';
       html = this.generatePaymentEmailHtml({
-        customerName: 'Demo Client',
-        customerEmail: 'demo@jobhub.platform',
+        customerName: 'Test Account User',
+        customerEmail: 'test@jobhub.platform',
         planName: 'Enterprise Talent Suite',
         amount: 148000,
         currency: 'NGN',
@@ -334,17 +262,17 @@ class EmailAutomationService {
         paidAt: new Date().toISOString(),
       });
     } else if (triggerId === 'interview_invitation') {
-      subject = 'Interview Scheduled: Senior Staff Frontend Architect at Apex Cloud';
+      subject = 'Interview Scheduled: Technical Staff Interview';
       preview = 'Your interview is confirmed for tomorrow at 2:00 PM WAT on Google Meet.';
-      html = this.generateInterviewEmailHtml('Alex Morgan', 'Apex Cloud Solutions', 'Senior Staff Frontend Architect');
+      html = this.generateInterviewEmailHtml('Applicant', 'Verified Organization', 'Staff Engineer');
     } else if (triggerId === 'application_submitted') {
-      subject = 'Application Confirmed: Lead Cloud Infrastructure Engineer';
-      preview = 'Your application has been delivered to Vanguard Health Systems recruitment team.';
-      html = this.generateApplicationSubmittedEmailHtml('Alex Morgan', 'Lead Cloud Infrastructure Engineer', 'Vanguard Health Systems');
+      subject = 'Application Confirmed: Technical Application Received';
+      preview = 'Your application has been delivered to the hiring team.';
+      html = this.generateApplicationSubmittedEmailHtml('Applicant', 'Staff Engineer', 'Hiring Organization');
     } else {
       subject = `Welcome to JOBHUB! [${trigger.name}]`;
-      preview = 'Your account has been activated with enterprise credentials.';
-      html = this.generateWelcomeEmailHtml('Alex Morgan', 'alex@jobhub.platform', 'candidate');
+      preview = 'Your account has been activated.';
+      html = this.generateWelcomeEmailHtml('Member', 'member@jobhub.platform', 'candidate');
     }
 
     const email: AutomatedEmailMessage = {

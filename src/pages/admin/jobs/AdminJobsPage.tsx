@@ -172,7 +172,7 @@ export function AdminJobsPage() {
                     <td className="py-3.5 px-4 text-slate-300">
                       <div className="flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{job.company?.company_name || 'Apex Cloud Solutions'}</span>
+                        <span>{job.company?.company_name || 'Unassigned Company'}</span>
                       </div>
                     </td>
 

@@ -124,7 +124,7 @@ export function EmployerDashboard() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                {company?.company_name || 'Apex Cloud Solutions'}
+                {company?.company_name || 'My Organization'}
               </h1>
               {isVerified ? (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
@@ -137,7 +137,7 @@ export function EmployerDashboard() {
               )}
             </div>
             <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-              Welcome back, <span className="text-slate-200 font-medium">{profile?.display_name || 'Marcus Vance'}</span> ({employerProfile?.job_title || 'Recruitment Lead'})
+              Welcome back, <span className="text-slate-200 font-medium">{profile?.display_name || profile?.first_name || 'Recruiter'}</span> ({employerProfile?.job_title || 'Hiring Lead'})
             </p>
           </div>
         </div>

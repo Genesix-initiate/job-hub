@@ -26,9 +26,9 @@ export function CompanyVerificationPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const [form, setForm] = useState({
-    registrationNumber: 'US-DEL-9842104',
-    registrationType: 'Corporation (C-Corp)',
-    authorizedRepresentative: profile?.display_name || 'Marcus Vance',
+    registrationNumber: '',
+    registrationType: 'Corporation (LLC / Ltd / C-Corp)',
+    authorizedRepresentative: profile?.display_name || profile?.first_name || '',
     documentType: 'Certificate of Incorporation',
     reviewerNotes: '',
   });

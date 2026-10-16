@@ -33,7 +33,7 @@ interface EmployerLayoutProps {
 }
 
 export function EmployerLayout({ children }: EmployerLayoutProps) {
-  const { profile, employerProfile, company, signOut, switchRole, demoLoginAsEmployer } = useAuth();
+  const { profile, employerProfile, company, signOut, switchRole } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -189,8 +189,8 @@ export function EmployerLayout({ children }: EmployerLayoutProps) {
                 className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-700 shrink-0"
               />
               <div className="overflow-hidden">
-                <p className="text-xs font-medium text-slate-200 truncate">{profile?.display_name || 'Marcus Vance'}</p>
-                <p className="text-[11px] text-slate-400 truncate">{company?.company_name || 'Apex Cloud'}</p>
+                <p className="text-xs font-medium text-slate-200 truncate">{profile?.display_name || profile?.first_name || 'Employer Account'}</p>
+                <p className="text-[11px] text-slate-400 truncate">{company?.company_name || 'Organization'}</p>
               </div>
             </div>
             <button

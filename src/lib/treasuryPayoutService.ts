@@ -59,23 +59,7 @@ export const DEFAULT_ADMIN_BANK: AdminBankAccount = {
   updatedBy: 'genesixintiate@gmail.com',
 };
 
-export const INITIAL_PAYOUTS: PayoutRecord[] = [
-  {
-    id: 'po-init-01',
-    reference: 'PO-NGN-202610-001',
-    amount: 3500000,
-    currency: 'NGN',
-    bankName: 'Zenith Bank Plc',
-    accountNumber: '1015893240',
-    accountName: 'GENESIX INITIATE GROUP LTD',
-    status: 'completed',
-    payoutDate: new Date(Date.now() - 86400000 * 5).toISOString(),
-    initiatedBy: 'genesixintiate@gmail.com',
-    fee: 0,
-    netAmount: 3500000,
-    notes: 'Q3 Enterprise ATS subscription disbursement settlement',
-  },
-];
+export const INITIAL_PAYOUTS: PayoutRecord[] = [];
 
 export const treasuryPayoutService = {
   /**
@@ -141,8 +125,17 @@ export const treasuryPayoutService = {
     availableBalance: number;
     currency: string;
   } {
-    // Base platform gross volume from enterprise subscriptions and job posts
-    const baseGrossRevenue = 14850000; // NGN equivalent or standard base volume
+    const localPayments = (() => {
+      try {
+        const raw = localStorage.getItem('jobhub_local_payments') || localStorage.getItem('talentforge_local_payments');
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    })();
+    const baseGrossRevenue = localPayments
+      .filter((p: any) => p.status === 'successful')
+      .reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
     const payouts = this.getPayoutHistory();
     const totalWithdrawn = payouts.reduce((sum, p) => sum + (p.status === 'completed' ? p.amount : 0), 0);
     const availableBalance = Math.max(0, baseGrossRevenue - totalWithdrawn);

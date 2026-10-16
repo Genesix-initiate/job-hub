@@ -16,38 +16,21 @@ import { dataService } from '../../lib/dataService';
 export function MessagesPage() {
   const { profile } = useAuth();
   const [conversations, setConversations] = useState<any[]>([]);
-  const [selectedConvId, setSelectedConvId] = useState<string>('conv-001');
+  const [selectedConvId, setSelectedConvId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
-  const [messagesList, setMessagesList] = useState<any[]>([
-    {
-      id: 'm1',
-      sender_id: 'recruiter',
-      message: 'Hello Alex! We were very impressed with your frontend application for the Senior TypeScript position.',
-      time: '10:30 AM',
-      read: true,
-    },
-    {
-      id: 'm2',
-      sender_id: 'user',
-      message: 'Thank you Sarah! I have been following Apex Cloud Solutions for a while and would love to discuss the microfrontends architecture.',
-      time: '10:34 AM',
-      read: true,
-    },
-    {
-      id: 'm3',
-      sender_id: 'recruiter',
-      message: 'Fantastic. We have scheduled the virtual architecture discussion for Thursday at 2:00 PM. Let us know if you need any adjustments.',
-      time: '10:45 AM',
-      read: true,
-    },
-  ]);
+  const [messagesList, setMessagesList] = useState<any[]>([]);
 
   useEffect(() => {
     if (profile?.id) {
-      dataService.getConversations(profile.id).then(setConversations);
+      dataService.getConversations(profile.id).then((convs) => {
+        setConversations(convs || []);
+        if (convs && convs.length > 0 && !selectedConvId) {
+          setSelectedConvId(convs[0].id);
+        }
+      });
     }
-  }, [profile?.id]);
+  }, [profile?.id, selectedConvId]);
 
   const activeConv = conversations.find((c) => c.id === selectedConvId) || conversations[0];
 
@@ -99,38 +82,48 @@ export function MessagesPage() {
           </div>
 
           <div className="overflow-y-auto flex-1 divide-y divide-slate-800/60">
-            {conversations.map((conv) => {
-              const isSelected = selectedConvId === conv.id;
-              return (
-                <div
-                  key={conv.id}
-                  onClick={() => setSelectedConvId(conv.id)}
-                  className={`p-4 transition cursor-pointer flex items-start gap-3 ${
-                    isSelected ? 'bg-slate-900 border-l-2 border-emerald-500' : 'hover:bg-slate-900/40'
-                  }`}
-                >
-                  <div className="relative shrink-0">
-                    <img
-                      src={conv.partner.avatar}
-                      alt={conv.partner.name}
-                      className="w-10 h-10 rounded-full object-cover border border-slate-700"
-                    />
-                    {conv.partner.online && (
-                      <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full absolute bottom-0 right-0 border-2 border-slate-950" />
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-white truncate">{conv.partner.name}</h4>
-                      <span className="text-[10px] text-slate-500 shrink-0">{conv.lastTime}</span>
+            {conversations.length === 0 ? (
+              <div className="p-6 text-center text-slate-500">
+                <MessageSquare className="w-8 h-8 mx-auto mb-2 text-slate-600 opacity-60" />
+                <p className="text-xs font-medium text-slate-400">No active conversations</p>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  When employers message you regarding your applications, they will appear here.
+                </p>
+              </div>
+            ) : (
+              conversations.map((conv) => {
+                const isSelected = selectedConvId === conv.id;
+                return (
+                  <div
+                    key={conv.id}
+                    onClick={() => setSelectedConvId(conv.id)}
+                    className={`p-4 transition cursor-pointer flex items-start gap-3 ${
+                      isSelected ? 'bg-slate-900 border-l-2 border-emerald-500' : 'hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="relative shrink-0">
+                      <img
+                        src={conv.partner.avatar}
+                        alt={conv.partner.name}
+                        className="w-10 h-10 rounded-full object-cover border border-slate-700"
+                      />
+                      {conv.partner.online && (
+                        <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full absolute bottom-0 right-0 border-2 border-slate-950" />
+                      )}
                     </div>
-                    <p className="text-[11px] text-slate-400 truncate">{conv.partner.title}</p>
-                    <p className="text-xs text-slate-300 truncate">{conv.lastMessage}</p>
+
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-white truncate">{conv.partner.name}</h4>
+                        <span className="text-[10px] text-slate-500 shrink-0">{conv.lastTime}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">{conv.partner.title}</p>
+                      <p className="text-xs text-slate-300 truncate">{conv.lastMessage}</p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 

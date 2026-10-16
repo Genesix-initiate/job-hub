@@ -464,8 +464,8 @@ class EmployerService {
 
     const createdJob: Job = {
       id: `job-${Date.now()}`,
-      company_id: payload.company_id || '30000000-0000-0000-0000-000000000001',
-      created_by: payload.created_by || '00000000-0000-0000-0000-000000000201',
+      company_id: payload.company_id || '',
+      created_by: payload.created_by || '',
       category_id: payload.category_id || 'cat-01',
       title: payload.title || 'Untitled Job',
       slug,
@@ -716,18 +716,7 @@ class EmployerService {
         }
       } catch {}
     }
-    return this.getStored<CandidateNote[]>(`notes_${applicationId}`, [
-      {
-        id: 'note-01',
-        application_id: applicationId,
-        employer_id: '30000000-0000-0000-0000-000000000001',
-        author_id: '00000000-0000-0000-0000-000000000201',
-        author_name: 'Marcus Vance',
-        note: 'Candidate demonstrated exemplary system design depth during initial resume review. Ready to advance to technical panel.',
-        created_at: new Date(Date.now() - 24 * 3600000).toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ]);
+    return this.getStored<CandidateNote[]>(`notes_${applicationId}`, []);
   }
 
   async addCandidateNote(

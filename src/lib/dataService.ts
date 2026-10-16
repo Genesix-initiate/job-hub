@@ -30,185 +30,7 @@ export interface JobWithCompany extends Job {
   is_saved?: boolean;
 }
 
-// Fallback seed data in case Supabase is waiting for connection or SQL run
-export const SEED_COMPANIES: Company[] = [
-  {
-    id: '30000000-0000-0000-0000-000000000001',
-    company_name: 'Apex Cloud Solutions',
-    slug: 'apex-cloud-solutions',
-    logo_url: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=150',
-    description: 'Next-generation cloud infrastructure orchestration and developer toolchain.',
-    industry: 'Information Technology',
-    company_size: '51-200',
-    founded_year: 2019,
-    website: 'https://apexcloud.example.com',
-    email: 'careers@apexcloud.example.com',
-    phone: '+1 (555) 123-4567',
-    country: 'United States',
-    state: 'California',
-    city: 'San Francisco',
-    address: '100 Pine Street, Suite 1200',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000002',
-    company_name: 'Vanguard Health Systems',
-    slug: 'vanguard-health-systems',
-    logo_url: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=150',
-    description: 'Premier regional hospital network delivering compassionate patient-first medical care.',
-    industry: 'Healthcare & Medicine',
-    company_size: '500-1000',
-    founded_year: 2008,
-    website: 'https://vanguardhealth.example.com',
-    email: 'jobs@vanguardhealth.example.com',
-    phone: '+1 (555) 234-8901',
-    country: 'United States',
-    state: 'Massachusetts',
-    city: 'Boston',
-    address: '75 Francis Street',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000003',
-    company_name: 'Meridian Capital Partners',
-    slug: 'meridian-capital-partners',
-    logo_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150',
-    description: 'Global investment banking, asset management, and fintech advisory advisory firm.',
-    industry: 'Banking & Financial Services',
-    company_size: '201-500',
-    founded_year: 2012,
-    website: 'https://meridiancap.example.com',
-    email: 'recruitment@meridiancap.example.com',
-    phone: '+44 20 7946 0921',
-    country: 'United Kingdom',
-    state: 'Greater London',
-    city: 'London',
-    address: '25 Bank Street, Canary Wharf',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000004',
-    company_name: 'Solaris Green Power',
-    slug: 'solaris-green-power',
-    logo_url: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=150',
-    description: 'Building utility-scale clean solar arrays and grid energy storage systems.',
-    industry: 'Energy & Renewable Resources',
-    company_size: '51-200',
-    founded_year: 2021,
-    website: 'https://solarisgreen.example.com',
-    email: 'talent@solarisgreen.example.com',
-    phone: '+49 30 1234567',
-    country: 'Germany',
-    state: 'Berlin',
-    city: 'Berlin',
-    address: 'Potsdamer Platz 1',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000005',
-    company_name: 'Kinetix Global Logistics',
-    slug: 'kinetix-global-logistics',
-    logo_url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=150',
-    description: 'Automated supply chain forwarding and smart cold-chain distribution network.',
-    industry: 'Logistics & Supply Chain',
-    company_size: '1000+',
-    founded_year: 2014,
-    website: 'https://kinetixlogistics.example.com',
-    email: 'hr@kinetixlogistics.example.com',
-    phone: '+1 (416) 555-0199',
-    country: 'Canada',
-    state: 'Ontario',
-    city: 'Toronto',
-    address: '400 Bay Street, Floor 14',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000006',
-    company_name: 'Paystack Payments Nigeria',
-    slug: 'paystack-nigeria',
-    logo_url: 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?w=150',
-    description: 'Modern payment infrastructure powering payments and commerce across Nigeria and Africa.',
-    industry: 'Banking & Financial Services',
-    company_size: '201-500',
-    founded_year: 2016,
-    website: 'https://paystack.com',
-    email: 'careers@paystack.com',
-    phone: '+234 1 888 8124',
-    country: 'Nigeria',
-    state: 'Lagos',
-    city: 'Lagos (Victoria Island)',
-    address: '1265 Commercial Avenue, Victoria Island',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000007',
-    company_name: 'Moniepoint Financial Group',
-    slug: 'moniepoint-financial',
-    logo_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=150',
-    description: 'All-in-one financial ecosystem and digital banking rails powering 1M+ African businesses.',
-    industry: 'Information Technology',
-    company_size: '500-1000',
-    founded_year: 2015,
-    website: 'https://moniepoint.com',
-    email: 'talent@moniepoint.com',
-    phone: '+234 1 900 9021',
-    country: 'Nigeria',
-    state: 'Lagos',
-    city: 'Lagos (Lekki Phase 1)',
-    address: 'Plot 12 Admiralty Way, Lekki',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '30000000-0000-0000-0000-000000000008',
-    company_name: 'Interswitch Group Africa',
-    slug: 'interswitch-group',
-    logo_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150',
-    description: 'Pioneering electronic transaction switching, digital payment cards, and payment gateway network.',
-    industry: 'Banking & Financial Services',
-    company_size: '1000+',
-    founded_year: 2002,
-    website: 'https://interswitchgroup.com',
-    email: 'recruitment@interswitchgroup.com',
-    phone: '+234 1 628 3888',
-    country: 'Nigeria',
-    state: 'Lagos',
-    city: 'Lagos (Oko Awo)',
-    address: '1644 Oko Awo Street, Victoria Island',
-    verification_status: 'verified',
-    verified_at: new Date().toISOString(),
-    created_by: '00000000-0000-0000-0000-000000000001',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+export const SEED_COMPANIES: Company[] = [];
 
 export const SEED_JOBS: JobWithCompany[] = [];
 
@@ -554,7 +376,15 @@ class DataService {
     }
 
     // Local state fallback
-    const job = SEED_JOBS.find((j) => j.id === params.jobId) || SEED_JOBS[0];
+    const localJobs = (() => {
+      try {
+        const raw = localStorage.getItem('tf_emp_employer_jobs') || localStorage.getItem('jobhub_employer_jobs');
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    })();
+    const job = localJobs.find((j: any) => j.id === params.jobId) || SEED_JOBS.find((j) => j.id === params.jobId) || null;
     const newApp = {
       id: `app-${Date.now()}`,
       job_id: params.jobId,
@@ -670,37 +500,15 @@ class DataService {
       } catch {}
     }
 
-    const sampleInterviews = [
-      {
-        id: 'interview-101',
-        application_id: 'app-003',
-        interview_type: 'technical',
-        title: 'Technical Architectural Discussion',
-        description: 'System design overview and frontend architecture deep-dive with VP of Engineering.',
-        scheduled_at: new Date(Date.now() + 2 * 86400000 + 4 * 3600000).toISOString(),
-        duration_minutes: 60,
-        location: 'Virtual Google Meet',
-        meeting_url: 'https://meet.google.com/xyz-talent-forge',
-        status: 'confirmed',
-        job: SEED_JOBS[0],
-        company: SEED_COMPANIES[0],
-      },
-      {
-        id: 'interview-102',
-        application_id: 'app-002',
-        interview_type: 'cultural',
-        title: 'Team Values & Culture Conversation',
-        description: 'Discussion on team collaboration and career goals with Engineering Manager.',
-        scheduled_at: new Date(Date.now() + 5 * 86400000 + 2 * 3600000).toISOString(),
-        duration_minutes: 45,
-        location: 'Virtual Room',
-        meeting_url: 'https://meet.google.com/abc-values-team',
-        status: 'scheduled',
-        job: SEED_JOBS[1],
-        company: SEED_COMPANIES[0],
-      },
-    ];
-    return sampleInterviews;
+    const key = `jobhub_interviews_${applicantId}`;
+    const legacyKey = `talentforge_interviews_${applicantId}`;
+    const saved = localStorage.getItem(key) || localStorage.getItem(legacyKey);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
   }
 
   // ---- NOTIFICATIONS ----

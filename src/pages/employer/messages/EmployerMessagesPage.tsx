@@ -17,80 +17,12 @@ import { Message, Profile } from '../../../types/database';
 export function EmployerMessagesPage() {
   const { company, profile } = useAuth();
 
-  const [conversations, setConversations] = useState<any[]>([
-    {
-      id: 'conv-001',
-      candidate: {
-        id: '00000000-0000-0000-0000-000000000101',
-        name: 'Alex Morgan',
-        role: 'Principal Cloud Solutions Architect',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
-        online: true,
-      },
-      lastMessage: 'Thank you for scheduling the architecture loop! Looking forward to meeting the engineering team.',
-      time: '10:45 AM',
-      unread: 1,
-    },
-    {
-      id: 'conv-002',
-      candidate: {
-        id: '00000000-0000-0000-0000-000000000102',
-        name: 'Elena Rostova',
-        role: 'DevOps & SRE Engineer',
-        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100',
-        online: false,
-      },
-      lastMessage: 'I have submitted the distributed systems assessment as requested.',
-      time: 'Yesterday',
-      unread: 0,
-    },
-    {
-      id: 'conv-003',
-      candidate: {
-        id: '00000000-0000-0000-0000-000000000104',
-        name: 'Sarah Lin',
-        role: 'Data & Analytics Lead',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
-        online: true,
-      },
-      lastMessage: 'Are there any specific frameworks preferred for the data engineering case study?',
-      time: 'Oct 4',
-      unread: 0,
-    },
-  ]);
-
-  const [activeConvId, setActiveConvId] = useState('conv-001');
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [activeConvId, setActiveConvId] = useState('');
   const [inputText, setInputText] = useState('');
   const [messages, setMessages] = useState<
     Record<string, Array<{ id: string; sender: 'employer' | 'candidate'; text: string; time: string }>>
-  >({
-    'conv-001': [
-      {
-        id: 'm-1',
-        sender: 'employer',
-        text: 'Hi Alex, we reviewed your resume and portfolio for the Cloud Architect position and were very impressed with your multi-tenant design patterns.',
-        time: '9:30 AM',
-      },
-      {
-        id: 'm-2',
-        sender: 'candidate',
-        text: 'Hello Marcus! Thank you so much. I have spent significant time over the last several years architecting fault-tolerant infrastructure, so the role at Apex Cloud Solutions is an ideal fit.',
-        time: '9:45 AM',
-      },
-      {
-        id: 'm-3',
-        sender: 'employer',
-        text: 'Fantastic! We just scheduled a 45-minute technical discussion for Thursday at 2:00 PM PST. Calendar details are attached.',
-        time: '10:15 AM',
-      },
-      {
-        id: 'm-4',
-        sender: 'candidate',
-        text: 'Thank you for scheduling the architecture loop! Looking forward to meeting the engineering team.',
-        time: '10:45 AM',
-      },
-    ],
-  });
+  >({});
 
   const activeConv = conversations.find((c) => c.id === activeConvId);
 
@@ -152,38 +84,48 @@ export function EmployerMessagesPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto divide-y divide-slate-800/80">
-            {conversations.map((c) => {
-              const isActive = c.id === activeConvId;
-              return (
-                <div
-                  key={c.id}
-                  onClick={() => setActiveConvId(c.id)}
-                  className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer ${
-                    isActive ? 'bg-indigo-600/15 border-l-2 border-indigo-500' : 'hover:bg-slate-900/60'
-                  }`}
-                >
-                  <div className="relative shrink-0">
-                    <img
-                      src={c.candidate.avatar}
-                      alt={c.candidate.name}
-                      className="w-10 h-10 rounded-full object-cover ring-1 ring-slate-800"
-                    />
-                    {c.candidate.online && (
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 absolute bottom-0 right-0 ring-2 ring-slate-900" />
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0 space-y-0.5">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-white truncate">{c.candidate.name}</h4>
-                      <span className="text-[10px] text-slate-500">{c.time}</span>
+            {conversations.length === 0 ? (
+              <div className="p-6 text-center text-slate-500">
+                <MessageSquare className="w-8 h-8 mx-auto mb-2 text-slate-600 opacity-60" />
+                <p className="text-xs font-medium text-slate-400">No active candidate conversations</p>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  When you initiate direct messaging with applicants or receive candidate inquiries, they will appear here.
+                </p>
+              </div>
+            ) : (
+              conversations.map((c) => {
+                const isActive = c.id === activeConvId;
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => setActiveConvId(c.id)}
+                    className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer ${
+                      isActive ? 'bg-indigo-600/15 border-l-2 border-indigo-500' : 'hover:bg-slate-900/60'
+                    }`}
+                  >
+                    <div className="relative shrink-0">
+                      <img
+                        src={c.candidate.avatar}
+                        alt={c.candidate.name}
+                        className="w-10 h-10 rounded-full object-cover ring-1 ring-slate-800"
+                      />
+                      {c.candidate.online && (
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 absolute bottom-0 right-0 ring-2 ring-slate-900" />
+                      )}
                     </div>
-                    <p className="text-[11px] text-slate-400 truncate">{c.candidate.role}</p>
-                    <p className="text-xs text-slate-300 truncate">{c.lastMessage}</p>
+
+                    <div className="flex-1 min-w-0 space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-white truncate">{c.candidate.name}</h4>
+                        <span className="text-[10px] text-slate-500">{c.time}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate">{c.candidate.role}</p>
+                      <p className="text-xs text-slate-300 truncate">{c.lastMessage}</p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 

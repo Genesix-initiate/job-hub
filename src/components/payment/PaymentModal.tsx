@@ -31,6 +31,7 @@ import {
   VirtualAccountDetails,
   OPayPaymentDetails,
 } from '../../lib/paymentChannels';
+import { useAuth } from '../../context/AuthContext';
 
 export interface PaymentModalProps {
   isOpen: boolean;
@@ -49,20 +50,26 @@ export function PaymentModal({
   paymentType = 'subscription',
   onPaymentSuccess,
 }: PaymentModalProps) {
+  const { profile, company } = useAuth();
+
   // Currency state
-  const [currency, setCurrency] = useState<string>('NGN'); // Default to NGN as requested!
+  const [currency, setCurrency] = useState<string>('NGN');
   const [activeTab, setActiveTab] = useState<'paystack' | 'bank_transfer' | 'ussd' | 'opay'>('paystack');
 
-  // Customer state
-  const [customerName, setCustomerName] = useState<string>('Alex Morgan');
-  const [customerEmail, setCustomerEmail] = useState<string>('alex.morgan@jobhub.io');
-  const [companyName, setCompanyName] = useState<string>('Apex Cloud Solutions');
+  // Customer state from active authenticated user (no demo accounts)
+  const [customerName, setCustomerName] = useState<string>(() => {
+    if (profile?.display_name) return profile.display_name;
+    if (profile?.first_name) return `${profile.first_name} ${profile.last_name}`.trim();
+    return '';
+  });
+  const [customerEmail, setCustomerEmail] = useState<string>(() => profile?.email || '');
+  const [companyName, setCompanyName] = useState<string>(() => company?.company_name || '');
 
-  // Paystack Card inputs
-  const [cardNumber, setCardNumber] = useState<string>('5399 4100 2841 9023');
-  const [cardExpiry, setCardExpiry] = useState<string>('12/28');
-  const [cardCvv, setCardCvv] = useState<string>('382');
-  const [cardPin, setCardPin] = useState<string>('8219');
+  // Paystack Card inputs (clean empty states)
+  const [cardNumber, setCardNumber] = useState<string>('');
+  const [cardExpiry, setCardExpiry] = useState<string>('');
+  const [cardCvv, setCardCvv] = useState<string>('');
+  const [cardPin, setCardPin] = useState<string>('');
 
   // Bank Transfer virtual account
   const [virtualAccount, setVirtualAccount] = useState<VirtualAccountDetails | null>(null);
@@ -74,7 +81,7 @@ export function PaymentModal({
 
   // OPay State
   const [opayDetails, setOpayDetails] = useState<OPayPaymentDetails | null>(null);
-  const [opayUserPhone, setOpayUserPhone] = useState<string>('08101234567');
+  const [opayUserPhone, setOpayUserPhone] = useState<string>(() => profile?.phone || '');
   const [opayPromptSent, setOpayPromptSent] = useState<boolean>(false);
 
   // Processing state
@@ -86,10 +93,24 @@ export function PaymentModal({
   // Calculate current amount in selected currency
   const convertedAmount = convertAmount(defaultPriceUSD, currency);
 
+  // Sync active logged in user profile when modal opens
+  useEffect(() => {
+    if (isOpen && profile) {
+      if (profile.display_name || profile.first_name) {
+        setCustomerName(profile.display_name || `${profile.first_name} ${profile.last_name}`.trim());
+      }
+      if (profile.email) setCustomerEmail(profile.email);
+      if (profile.phone) setOpayUserPhone(profile.phone);
+    }
+    if (isOpen && company?.company_name) {
+      setCompanyName(company.company_name);
+    }
+  }, [isOpen, profile, company]);
+
   // Init virtual account and opay details when modal opens or currency/amount changes
   useEffect(() => {
     if (isOpen) {
-      const vAcc = generateVirtualAccount(customerName, convertedAmount, currency);
+      const vAcc = generateVirtualAccount(customerName || 'Subscriber', convertedAmount, currency);
       setVirtualAccount(vAcc);
       const opDetails = generateOPayDetails(vAcc.transferReference, convertedAmount, currency);
       setOpayDetails(opDetails);

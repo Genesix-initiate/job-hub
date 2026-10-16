@@ -129,8 +129,8 @@ export function ApplicationDetailPage() {
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNoteText.trim() || !company?.id) return;
-    const authorName = profile?.display_name || 'Marcus Vance';
-    const authorId = profile?.id || '00000000-0000-0000-0000-000000000201';
+    const authorName = profile?.display_name || profile?.first_name || 'Hiring Lead';
+    const authorId = profile?.id || 'recruiter-actor';
 
     const added = await employerService.addCandidateNote(
       application.id,

@@ -185,7 +185,7 @@ export function EmployerRegisterPage() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    placeholder="Marcus"
+                    placeholder="John"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -197,7 +197,7 @@ export function EmployerRegisterPage() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    placeholder="Vance"
+                    placeholder="Doe"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -209,7 +209,7 @@ export function EmployerRegisterPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="marcus@company.com"
+                    placeholder="recruiter@company.com"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -242,7 +242,7 @@ export function EmployerRegisterPage() {
                     name="companyName"
                     value={formData.companyName}
                     onChange={handleChange}
-                    placeholder="Apex Cloud Solutions Inc."
+                    placeholder="Acme Global Technologies Inc."
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
