@@ -414,41 +414,53 @@ export function AdminPaymentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition">
-                    <td className="py-3.5 px-4 font-mono font-semibold text-white">
-                      {p.transaction_reference}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-slate-300">
-                      <div>{p.company_name || 'Apex Cloud Solutions'}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">{p.payer_name}</div>
-                    </td>
-
-                    <td className="py-3.5 px-4 capitalize text-slate-300 font-mono text-[11px]">
-                      {p.payment_type.replace('_', ' ')}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-mono font-semibold text-white">
-                      ${p.amount.toFixed(2)}
-                    </td>
-
-                    <td className="py-3.5 px-4 capitalize text-slate-300 font-mono text-[11px]">
-                      {p.payment_method}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
-                      {new Date(p.created_at).toLocaleDateString()}
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                        {p.status}
-                      </span>
+                {payments.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-slate-500">
+                      <CreditCard className="w-8 h-8 mx-auto mb-2 text-slate-600 opacity-60" />
+                      <p className="text-xs font-semibold text-slate-400">No payment transactions recorded yet</p>
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Settlements via Paystack, Bank Transfer, USSD, and cards will be audited here in real time.
+                      </p>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  payments.map((p) => (
+                    <tr key={p.id} className="hover:bg-slate-800/40 transition">
+                      <td className="py-3.5 px-4 font-mono font-semibold text-white">
+                        {p.transaction_reference}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-slate-300">
+                        <div>{p.company_name || 'Direct Payer / Organization'}</div>
+                        <div className="text-[11px] text-slate-500 font-mono">{p.payer_name}</div>
+                      </td>
+
+                      <td className="py-3.5 px-4 capitalize text-slate-300 font-mono text-[11px]">
+                        {p.payment_type.replace('_', ' ')}
+                      </td>
+
+                      <td className="py-3.5 px-4 font-mono font-semibold text-white">
+                        ${p.amount.toFixed(2)}
+                      </td>
+
+                      <td className="py-3.5 px-4 capitalize text-slate-300 font-mono text-[11px]">
+                        {p.payment_method}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
+                        {new Date(p.created_at).toLocaleDateString()}
+                      </td>
+
+                      <td className="py-3.5 px-4">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          {p.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

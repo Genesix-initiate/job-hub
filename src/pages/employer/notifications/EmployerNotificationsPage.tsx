@@ -17,53 +17,20 @@ import { useAuth } from '../../../context/AuthContext';
 export function EmployerNotificationsPage() {
   const { company } = useAuth();
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 'notif-1',
-      type: 'job_expiry',
-      title: 'Job Deadline Approaching',
-      message: 'The application deadline for "Principal Cloud Solutions Architect" expires in 3 days.',
-      time: '2 hours ago',
-      read: false,
-      urgent: true,
-    },
-    {
-      id: 'notif-2',
-      type: 'new_application',
-      title: 'New Candidate Applied',
-      message: 'Alex Morgan submitted an application for the Principal Cloud Solutions Architect role.',
-      time: '5 hours ago',
-      read: false,
-      urgent: false,
-    },
-    {
-      id: 'notif-3',
-      type: 'assessment_completed',
-      title: 'Assessment Challenge Completed',
-      message: 'Elena Rostova finished the "Cloud Infrastructure" assessment with a passing score of 92%.',
-      time: 'Yesterday',
-      read: true,
-      urgent: false,
-    },
-    {
-      id: 'notif-4',
-      type: 'interview_confirmed',
-      title: 'Interview Slot Confirmed',
-      message: 'Elena Rostova confirmed attendance for the Technical Loop on Thursday at 2:00 PM PST.',
-      time: 'Yesterday',
-      read: true,
-      urgent: false,
-    },
-    {
-      id: 'notif-5',
-      type: 'verification',
-      title: 'Company Verification Active',
-      message: `${company?.company_name || 'Apex Cloud Solutions'} legal business documents are verified.`,
-      time: '3 days ago',
-      read: true,
-      urgent: false,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>(() => {
+    try {
+      const raw =
+        localStorage.getItem('jobhub_employer_notifications') ||
+        localStorage.getItem('jobhub_inapp_notifications');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return [];
+  });
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -149,8 +116,12 @@ export function EmployerNotificationsPage() {
         ))}
 
         {notifications.length === 0 && (
-          <div className="text-center py-12 text-xs text-slate-500">
-            No notifications received.
+          <div className="text-center py-16 text-slate-500 bg-slate-900/40 rounded-2xl border border-slate-800/80 p-8">
+            <BellRing className="w-8 h-8 mx-auto mb-2 text-slate-600 opacity-60" />
+            <p className="text-xs font-semibold text-slate-400">No notifications at this time</p>
+            <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
+              Real-time updates regarding new candidate submissions, assessment completions, and interview confirmations will appear here.
+            </p>
           </div>
         )}
       </div>

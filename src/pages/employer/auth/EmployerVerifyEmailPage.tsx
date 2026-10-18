@@ -6,16 +6,17 @@ import { useAuth } from '../../../context/AuthContext';
 export function EmployerVerifyEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, employerProfile, demoLoginAsEmployer } = useAuth();
+  const { user, employerProfile } = useAuth();
   const email = (location.state as any)?.email || 'recruiter@company.com';
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
 
   const handleContinue = () => {
-    if (!user || !employerProfile) {
-      demoLoginAsEmployer('employer_owner', email);
+    if (user && employerProfile) {
+      navigate('/employer/dashboard');
+    } else {
+      navigate('/employer/login');
     }
-    navigate('/employer/dashboard');
   };
 
   const handleResend = () => {

@@ -85,29 +85,29 @@ export function AdminEmailAutomationPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Application dispatch fields
-  const [appId, setAppId] = useState('APP-2026-0812');
-  const [appName, setAppName] = useState('Alex Morgan');
-  const [appEmail, setAppEmail] = useState('alex.morgan@example.com');
-  const [appJob, setAppJob] = useState('Senior Staff Frontend Architect');
-  const [appCompany, setAppCompany] = useState('Apex Cloud Solutions');
+  const [appId, setAppId] = useState('APP-DISPATCH-TEST');
+  const [appName, setAppName] = useState('Candidate Name');
+  const [appEmail, setAppEmail] = useState('candidate@example.com');
+  const [appJob, setAppJob] = useState('Senior Software Engineer');
+  const [appCompany, setAppCompany] = useState('Enterprise Partner');
   const [appStatus, setAppStatus] = useState<ApplicationNotificationStatus>('interview');
-  const [appNotes, setAppNotes] = useState('Candidate passed initial ATS evaluation and invited for 45-min architectural interview.');
+  const [appNotes, setAppNotes] = useState('Candidate invited for architectural screening interview.');
   const [appInterviewDate, setAppInterviewDate] = useState('Tomorrow at 3:00 PM UTC');
-  const [appMeetingLink, setAppMeetingLink] = useState('https://meet.jobhub.platform/apex-frontend');
-  const [appSalaryOffer, setAppSalaryOffer] = useState('$175,000 / year + equity options');
+  const [appMeetingLink, setAppMeetingLink] = useState('https://meet.jobhub.platform/interview-room');
+  const [appSalaryOffer, setAppSalaryOffer] = useState('');
 
   // Subscription dispatch fields
-  const [subId, setSubId] = useState('sub_apex_01');
-  const [subCustName, setSubCustName] = useState('Marcus Vance');
-  const [subCustEmail, setSubCustEmail] = useState('billing@apexcloud.example.com');
-  const [subCompany, setSubCompany] = useState('Apex Cloud Solutions');
+  const [subId, setSubId] = useState('sub_tier_test');
+  const [subCustName, setSubCustName] = useState('Recruitment Partner');
+  const [subCustEmail, setSubCustEmail] = useState('billing@company.com');
+  const [subCompany, setSubCompany] = useState('Hiring Enterprise');
   const [subPlan, setSubPlan] = useState('Growth Recruiter Tier');
   const [subEvent, setSubEvent] = useState<SubscriptionNotificationEvent>('plan_price_changed');
   const [subAmount, setSubAmount] = useState<number>(149);
   const [subCurrency, setSubCurrency] = useState('USD');
-  const [subInvoice, setSubInvoice] = useState('INV-2026-0041');
+  const [subInvoice, setSubInvoice] = useState('INV-TAX-001');
   const [subPaymentChannel, setSubPaymentChannel] = useState('Paystack Multi-Currency Rail');
-  const [subNextBillingDate, setSubNextBillingDate] = useState('November 12, 2026');
+  const [subNextBillingDate, setSubNextBillingDate] = useState('Next billing cycle');
 
   // Copy code state
   const [copiedCode, setCopiedCode] = useState(false);
@@ -198,50 +198,50 @@ export function AdminEmailAutomationPage() {
 
   const handleQuickPresetApp = (preset: 'alex' | 'samantha' | 'david') => {
     if (preset === 'alex') {
-      setAppId('APP-2026-0812');
-      setAppName('Alex Morgan');
-      setAppEmail('alex.morgan@example.com');
-      setAppJob('Senior Staff Frontend Architect');
-      setAppCompany('Apex Cloud Solutions');
+      setAppId('APP-STAGE-01');
+      setAppName('Candidate - Lead Engineer');
+      setAppEmail('candidate.lead@example.com');
+      setAppJob('Lead Systems Architect');
+      setAppCompany('Global Tech Partners');
       setAppStatus('interview');
-      setAppNotes('Round 2 Technical System Architecture interview with VP of Engineering.');
+      setAppNotes('Round 2 Technical Architecture interview with VP of Engineering.');
       setAppInterviewDate('Tomorrow at 3:00 PM UTC');
       setAppSalaryOffer('');
     } else if (preset === 'samantha') {
-      setAppId('APP-2026-0813');
-      setAppName('Samantha Reed');
-      setAppEmail('samantha.reed@example.com');
+      setAppId('APP-STAGE-02');
+      setAppName('Candidate - Infrastructure');
+      setAppEmail('candidate.infra@example.com');
       setAppJob('Lead Cloud Infrastructure & DevOps');
-      setAppCompany('Apex Cloud Solutions');
+      setAppCompany('Global Tech Partners');
       setAppStatus('shortlisted');
-      setAppNotes('Shortlisted into top 5% candidate tier based on Kubernetes & Terraform credentials.');
+      setAppNotes('Shortlisted into top candidate tier based on technical evaluation.');
       setAppInterviewDate('');
       setAppSalaryOffer('');
     } else if (preset === 'david') {
-      setAppId('APP-2026-0815');
-      setAppName('David Chen');
-      setAppEmail('david.applicant@example.com');
+      setAppId('APP-STAGE-03');
+      setAppName('Candidate - Staff Architect');
+      setAppEmail('candidate.staff@example.com');
       setAppJob('Senior Staff Frontend Architect');
-      setAppCompany('Apex Cloud Solutions');
+      setAppCompany('Global Tech Partners');
       setAppStatus('offer');
       setAppNotes('Formal job offer approved by Executive Hiring Board.');
-      setAppSalaryOffer('$185,000 / year + 0.25% equity grant');
+      setAppSalaryOffer('$185,000 / year');
     }
   };
 
   const handleQuickPresetSub = (preset: 'apex' | 'fintech' | 'scaleup') => {
     if (preset === 'apex') {
-      setSubId('sub_apex_01');
-      setSubCustName('Marcus Vance');
-      setSubCustEmail('billing@apexcloud.example.com');
-      setSubCompany('Apex Cloud Solutions');
+      setSubId('sub_tier_01');
+      setSubCustName('Talent Partner Lead');
+      setSubCustEmail('billing@globalpartners.example.com');
+      setSubCompany('Global Tech Partners');
       setSubPlan('Growth Recruiter Tier');
       setSubEvent('plan_price_changed');
       setSubAmount(149);
       setSubCurrency('USD');
-      setSubInvoice('INV-2026-0041');
+      setSubInvoice('INV-TAX-0041');
       setSubPaymentChannel('Paystack Multi-Currency Rail');
-      setSubNextBillingDate('November 12, 2026');
+      setSubNextBillingDate('Next Billing Cycle');
     } else if (preset === 'fintech') {
       setSubId('sub_fintech_02');
       setSubCustName('Amina Adeleke');
@@ -656,11 +656,11 @@ serve(async (req: Request) => {
                           setPreviewHtml(
                             adminNotificationService['generateApplicationHtmlPreview'](
                               {
-                                applicationId: 'APP-2026-0812',
-                                applicantName: 'Alex Morgan',
+                                applicationId: 'APP-PREVIEW-01',
+                                applicantName: 'Candidate Name',
                                 applicantEmail: t.sampleRecipient,
-                                jobTitle: 'Senior Staff Frontend Architect',
-                                companyName: 'Apex Cloud Solutions',
+                                jobTitle: 'Senior Software Engineer',
+                                companyName: 'Enterprise Partner',
                                 status: t.eventType as ApplicationNotificationStatus,
                                 interviewDate: 'Thursday, 3:00 PM UTC',
                                 salaryOffer: '$175,000 / year',
@@ -675,14 +675,14 @@ serve(async (req: Request) => {
                             adminNotificationService['generateSubscriptionHtmlPreview'](
                               {
                                 subscriptionId: 'sub_sample_01',
-                                customerName: 'Marcus Vance',
+                                customerName: 'Billing Contact',
                                 customerEmail: t.sampleRecipient,
-                                companyName: 'Apex Cloud Solutions',
+                                companyName: 'Enterprise Partner',
                                 planName: 'Growth Recruiter Tier',
                                 eventType: t.eventType as SubscriptionNotificationEvent,
                                 amount: 149,
                                 currency: 'USD',
-                                invoiceNumber: 'INV-2026-0041',
+                                invoiceNumber: 'INV-TAX-0041',
                                 paymentChannel: 'Paystack Multi-Currency Rail',
                                 nextBillingDate: 'November 12, 2026',
                               },
@@ -924,7 +924,7 @@ serve(async (req: Request) => {
                     onClick={() => handleQuickPresetSub('apex')}
                     className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] cursor-pointer"
                   >
-                    Apex (Price Update)
+                    Tier 1 (Price Update)
                   </button>
                   <button
                     type="button"
@@ -1425,7 +1425,7 @@ serve(async (req: Request) => {
                                       applicantName: recipientName || 'Candidate',
                                       applicantEmail: recipient,
                                       jobTitle: 'Position Role',
-                                      companyName: 'Apex Cloud Solutions',
+                                      companyName: 'Hiring Organization',
                                       status: (eventType as ApplicationNotificationStatus) || 'interview',
                                     });
                                   } else {

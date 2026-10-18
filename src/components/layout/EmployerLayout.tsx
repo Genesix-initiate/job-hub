@@ -33,7 +33,7 @@ interface EmployerLayoutProps {
 }
 
 export function EmployerLayout({ children }: EmployerLayoutProps) {
-  const { profile, employerProfile, company, signOut, switchRole } = useAuth();
+  const { profile, employerProfile, company, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -171,12 +171,11 @@ export function EmployerLayout({ children }: EmployerLayoutProps) {
           {/* Switch to Job Seeker View */}
           <button
             onClick={() => {
-              switchRole('job_seeker');
               navigate('/jobs');
             }}
             className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-colors mb-2"
           >
-            <span>Switch to Job Seeker Portal</span>
+            <span>Explore Candidate Portal</span>
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
@@ -267,12 +266,11 @@ export function EmployerLayout({ children }: EmployerLayoutProps) {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  switchRole('job_seeker');
                   navigate('/jobs');
                 }}
                 className="w-full text-left text-xs text-slate-400 hover:text-emerald-400 py-1"
               >
-                Go to Job Seeker Portal &rarr;
+                Explore Candidate Portal &rarr;
               </button>
               <button
                 onClick={() => {

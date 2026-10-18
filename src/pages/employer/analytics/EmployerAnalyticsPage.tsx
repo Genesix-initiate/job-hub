@@ -173,7 +173,7 @@ export function EmployerAnalyticsPage() {
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
           <h3 className="text-sm font-bold text-white">Team Activity Summary (Section 56)</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Authorized recruiters and hiring managers at {company?.company_name || 'Apex Cloud'} actively evaluating applications.
+            Authorized recruiters and hiring managers at {company?.company_name || 'your organization'} actively evaluating applications.
           </p>
           <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs text-slate-300">
             <div className="flex justify-between">

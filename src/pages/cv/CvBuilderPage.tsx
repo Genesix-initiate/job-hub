@@ -30,78 +30,40 @@ export function CvBuilderPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<'classic' | 'modern' | 'professional'>('modern');
 
   // Multi-step form state
-  const [cvTitle, setCvTitle] = useState('Senior Frontend Engineer CV');
+  const [cvTitle, setCvTitle] = useState('Professional Resume');
   const [personalInfo, setPersonalInfo] = useState({
-    fullName: profile ? `${profile.first_name} ${profile.last_name}` : 'Alex Morgan',
-    email: profile?.email || 'alex.morgan@example.com',
-    phone: profile?.phone || '+1 (555) 234-5678',
-    location: profile ? `${profile.city}, ${profile.country}` : 'San Francisco, CA, USA',
-    website: 'https://alexmorgan.dev',
-    linkedin: 'linkedin.com/in/alexmorgan',
-    github: 'github.com/alexmorgan',
+    fullName: profile ? `${profile.first_name} ${profile.last_name}`.trim() : '',
+    email: profile?.email || '',
+    phone: profile?.phone || '',
+    location: profile?.city ? `${profile.city}, ${profile.country}` : '',
+    website: '',
+    linkedin: '',
+    github: '',
   });
 
   const [summary, setSummary] = useState(
-    jobSeekerProfile?.professional_summary ||
-      'Experienced Senior Frontend Engineer with 6+ years designing accessible, high-performance web applications and modular design systems. Proven record leading React and TypeScript web applications across enterprise scale.'
+    jobSeekerProfile?.professional_summary || ''
   );
 
-  const [experiences, setExperiences] = useState([
-    {
-      id: '1',
-      company: 'Apex Cloud Solutions',
-      title: 'Senior Frontend Engineer',
-      startDate: '2022-03',
-      endDate: 'Present',
-      isCurrent: true,
-      description: 'Architected collaborative web dashboards and microfrontend design systems. Reduced client bundle sizes by 38% and mentored junior developers.',
-    },
-    {
-      id: '2',
-      company: 'TechFlow Labs',
-      title: 'Full-Stack Developer',
-      startDate: '2019-06',
-      endDate: '2022-02',
-      isCurrent: false,
-      description: 'Implemented TypeScript web apps and PostgreSQL schemas. Authored robust REST and WebSocket real-time data feeds.',
-    },
+  const [experiences, setExperiences] = useState<any[]>([]);
+
+  const [educationList, setEducationList] = useState<any[]>([]);
+
+  const [skillsList, setSkillsList] = useState<string[]>([
+    'Problem Solving',
+    'Communication',
+    'Project Management',
+    'Data Analysis',
+    'Team Leadership',
   ]);
 
-  const [educationList, setEducationList] = useState([
-    {
-      id: '1',
-      institution: 'University of California, Berkeley',
-      qualification: 'B.S. in Computer Science',
-      field: 'Software Engineering',
-      startYear: '2015',
-      endYear: '2019',
-      grade: '3.8 GPA',
-    },
-  ]);
-
-  const [skillsList, setSkillsList] = useState([
-    'TypeScript',
-    'React',
-    'Next.js / Vite',
-    'Tailwind CSS',
-    'PostgreSQL',
-    'Docker',
-    'State Management',
-    'REST & GraphQL APIs',
-  ]);
-
-  const [certifications, setCertifications] = useState([
-    { id: '1', name: 'AWS Certified Solutions Architect', org: 'Amazon Web Services', year: '2023' },
-  ]);
+  const [certifications, setCertifications] = useState<any[]>([]);
 
   const [languages, setLanguages] = useState([
-    { language: 'English', proficiency: 'Native' },
-    { language: 'Spanish', proficiency: 'Conversational' },
+    { language: 'English', proficiency: 'Fluent' },
   ]);
 
-  const [references, setReferences] = useState([
-    { name: 'Dr. Marcus Vance', company: 'TechFlow Labs', role: 'VP of Engineering', email: 'm.vance@example.com' },
-  ]);
+  const [references, setReferences] = useState<any[]>([]);
 
   const [isSavedNotice, setIsSavedNotice] = useState(false);
 

@@ -328,7 +328,7 @@ export function ApplyJobModal({ job, isOpen, onClose, onSuccess }: ApplyJobModal
                     rows={6}
                     value={coverLetter}
                     onChange={(e) => setCoverLetter(e.target.value)}
-                    placeholder="Introduce yourself, explain your interest in this specific role, and highlight key achievements relevant to Apex Cloud Solutions..."
+                    placeholder={`Introduce yourself, explain your interest in this specific role, and highlight key achievements relevant to ${job?.company?.company_name || 'this organization'}...`}
                     className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-2xl p-3.5 text-xs text-white placeholder-slate-600 focus:outline-none resize-none leading-relaxed"
                   />
                   <p className="text-[11px] text-slate-500 leading-relaxed">

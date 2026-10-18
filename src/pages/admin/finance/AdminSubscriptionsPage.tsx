@@ -113,7 +113,7 @@ export function AdminSubscriptionsPage() {
           subscriptionId: `sub_tier_${editingPlan.id}`,
           customerName: 'Active Plan Subscribers',
           customerEmail: 'subscribers@jobhub.platform',
-          companyName: 'Apex Cloud & Enterprise Cohorts',
+          companyName: 'Platform Subscribers',
           planName: planForm.name || editingPlan.name,
           eventType: 'plan_price_changed',
           amount: Number(planForm.price) || 0,
@@ -277,38 +277,50 @@ export function AdminSubscriptionsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
-                  {subscriptions.map((sub) => (
-                    <tr key={sub.id} className="hover:bg-slate-800/40 transition">
-                      <td className="py-3.5 px-4 font-semibold text-white">
-                        {sub.company_name || 'Apex Cloud Solutions'}
-                      </td>
-
-                      <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                          {sub.plan?.name || 'Growth'}
-                        </span>
-                      </td>
-
-                      <td className="py-3.5 px-4 font-mono text-slate-200">
-                        {getCurrencySymbol(sub.plan?.currency)}{sub.plan?.price || 149}.00 / {sub.plan?.billing_interval || 'month'}
-                      </td>
-
-                      <td className="py-3.5 px-4 font-mono text-slate-400 text-[11px]">
-                        {sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : 'Active cycle'}
-                      </td>
-
-                      <td className="py-3.5 px-4 text-emerald-400 font-mono text-[11px]">
-                        {!sub.cancel_at_period_end ? 'Active' : 'Cancelled at term'}
-                      </td>
-
-                      <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          {sub.status}
-                        </span>
+                  {subscriptions.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-500">
+                        <CreditCard className="w-8 h-8 mx-auto mb-2 text-slate-600 opacity-60" />
+                        <p className="text-xs font-semibold text-slate-400">No active subscriptions yet</p>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          Employer memberships and recruiter plan enrollments will be listed here.
+                        </p>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    subscriptions.map((sub) => (
+                      <tr key={sub.id} className="hover:bg-slate-800/40 transition">
+                        <td className="py-3.5 px-4 font-semibold text-white">
+                          {sub.company_name || 'Organization'}
+                        </td>
+
+                        <td className="py-3.5 px-4">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                            {sub.plan?.name || 'Growth'}
+                          </span>
+                        </td>
+
+                        <td className="py-3.5 px-4 font-mono text-slate-200">
+                          {getCurrencySymbol(sub.plan?.currency)}{sub.plan?.price || 149}.00 / {sub.plan?.billing_interval || 'month'}
+                        </td>
+
+                        <td className="py-3.5 px-4 font-mono text-slate-400 text-[11px]">
+                          {sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString() : 'Active cycle'}
+                        </td>
+
+                        <td className="py-3.5 px-4 text-emerald-400 font-mono text-[11px]">
+                          {!sub.cancel_at_period_end ? 'Active' : 'Cancelled at term'}
+                        </td>
+
+                        <td className="py-3.5 px-4">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            {sub.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

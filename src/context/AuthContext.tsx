@@ -729,9 +729,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Backward compatibility methods
-  const demoLoginAsJobSeeker = (customEmail?: string, customName?: string) => {
-    const emailToUse = customEmail?.trim() || 'alex.morgan@example.com';
-    signInCandidate(emailToUse, 'password123');
+  const demoLoginAsJobSeeker = (customEmail?: string, _customName?: string) => {
+    if (customEmail?.trim()) {
+      signInCandidate(customEmail.trim(), '');
+    }
   };
 
   const demoLoginAsEmployer = (
@@ -739,23 +740,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     customEmail?: string,
     _companyName?: string
   ) => {
-    const emailToUse = customEmail?.trim() || 'recruiter@company.com';
-    signInEmployer(emailToUse, 'password123');
-  };
-
-  const demoLoginAsAdmin = (role: AdminRoleName = 'super_admin', customEmail?: string) => {
-    const emailToUse = customEmail?.trim() || (role === 'content_admin' ? 'content@jobhub.platform' : 'admin@jobhub.platform');
-    signInAdmin(emailToUse, 'password123');
-  };
-
-  const switchRole = (role: 'job_seeker' | 'employer' | 'admin') => {
-    if (role === 'admin') {
-      signInAdmin('admin@jobhub.platform', 'password123');
-    } else if (role === 'employer') {
-      signInEmployer('recruiter@company.com', 'password123');
-    } else {
-      signInCandidate('alex.morgan@example.com', 'password123');
+    if (customEmail?.trim()) {
+      signInEmployer(customEmail.trim(), '');
     }
+  };
+
+  const demoLoginAsAdmin = (_role: AdminRoleName = 'super_admin', customEmail?: string) => {
+    if (customEmail?.trim()) {
+      signInAdmin(customEmail.trim(), '');
+    }
+  };
+
+  const switchRole = (_role: 'job_seeker' | 'employer' | 'admin') => {
+    // Role navigation handled by direct router routing
   };
 
   const hasAdminPermission = (permission: string): boolean => {

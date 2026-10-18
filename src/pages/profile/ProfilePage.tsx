@@ -269,7 +269,7 @@ export function ProfilePage() {
               <input
                 type="email"
                 disabled
-                value={profile?.email || 'alex.morgan@example.com'}
+                value={profile?.email || ''}
                 className="w-full bg-slate-950/60 border border-slate-800/80 rounded-xl px-3.5 py-2 text-xs text-slate-400 cursor-not-allowed"
               />
             </div>

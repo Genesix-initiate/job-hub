@@ -28,17 +28,17 @@ export function InterviewDetailsPage() {
   const [micChecked, setMicChecked] = useState(true);
   const [cameraChecked, setCameraChecked] = useState(true);
 
-  // Sample data
+  // Interview data
   const interview = {
-    id: id || 'interview-101',
-    title: 'Technical Architectural Discussion',
-    companyName: 'Apex Cloud Solutions',
-    jobTitle: 'Senior Full-Stack TypeScript Engineer',
+    id: id || 'interview-session',
+    title: 'Technical Evaluation & Interview Discussion',
+    companyName: 'Hiring Organization',
+    jobTitle: 'Open Position',
     scheduledAt: new Date(Date.now() + 2 * 86400000 + 4 * 3600000).toISOString(),
-    durationMinutes: 60,
+    durationMinutes: 45,
     interviewType: 'technical',
-    meetingUrl: 'https://meet.google.com/xyz-talent-forge',
-    instructions: 'Please be in a quiet space with stable high-speed internet. You will be asked to share your screen to walk through architectural tradeoffs and review past GitHub contributions.',
+    meetingUrl: 'https://meet.google.com/interview-room',
+    instructions: 'Please be in a quiet space with stable high-speed internet. You will be asked to share your screen and discuss technical project experiences.',
   };
 
   const handleRescheduleSubmit = (e: React.FormEvent) => {
